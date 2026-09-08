@@ -1,0 +1,6 @@
+{
+  "name": "Invito Battesimo Ginevra",
+  "description": "Elegante invito digitale 3D interattivo per il Battesimo di Ginevra, con ambientazione idilliaca, farfalle animate, dettagli della cerimonia e indicazioni stradali.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
