@@ -31,9 +31,13 @@ export const Invitation3DScene: React.FC<Invitation3DSceneProps> = ({
 
   // Handle reset camera view trigger
   useEffect(() => {
-    if (resetViewTrigger && cameraRef.current && controlsRef.current) {
-      cameraRef.current.position.set(0.2, 1.25, 1.9);
-      controlsRef.current.target.set(0, 0.55, 0);
+    if (resetViewTrigger && cameraRef.current && controlsRef.current && containerRef.current) {
+      const isMobile = containerRef.current.clientWidth < 768;
+      const targetZ = isMobile ? 2.65 : 2.25;
+      const targetY = isMobile ? 1.28 : 1.20;
+      const targetX = isMobile ? 0.16 : 0.22;
+      cameraRef.current.position.set(targetX, targetY, targetZ);
+      controlsRef.current.target.set(0, 0.52, 0);
       controlsRef.current.update();
     }
   }, [resetViewTrigger]);
@@ -46,14 +50,19 @@ export const Invitation3DScene: React.FC<Invitation3DSceneProps> = ({
     const scene = new THREE.Scene();
     scene.fog = new THREE.Fog('#faeee4', 10, 32);
 
-    // 2. Camera
+    // 2. Camera with responsive distance for elegant framing
+    const isMobile = container.clientWidth < 768;
+    const initialCamZ = isMobile ? 2.65 : 2.25;
+    const initialCamY = isMobile ? 1.28 : 1.20;
+    const initialCamX = isMobile ? 0.16 : 0.22;
+
     const camera = new THREE.PerspectiveCamera(
       38,
       container.clientWidth / container.clientHeight,
       0.1,
       100
     );
-    camera.position.set(0.2, 1.25, 1.9);
+    camera.position.set(initialCamX, initialCamY, initialCamZ);
     cameraRef.current = camera;
 
     // 3. Renderer with high-quality tone mapping
@@ -641,15 +650,15 @@ export const Invitation3DScene: React.FC<Invitation3DSceneProps> = ({
       const ctx = canvas.getContext('2d');
       if (!ctx) return new THREE.CanvasTexture(canvas);
 
-      // Background Paper texture with delicate grain
-      ctx.fillStyle = '#fff9f2';
+      // Background Paper: bright, clean, luminous white
+      ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      for (let i = 0; i < 9000; i++) {
+      for (let i = 0; i < 2500; i++) {
         const x = Math.random() * canvas.width;
         const y = Math.random() * canvas.height;
-        ctx.fillStyle = `rgba(201,168,106,${Math.random() * 0.05})`;
-        ctx.fillRect(x, y, 1.2, 1.2);
+        ctx.fillStyle = `rgba(201,168,106,${Math.random() * 0.015})`;
+        ctx.fillRect(x, y, 1.0, 1.0);
       }
 
       // Elegant gold borders
@@ -665,7 +674,7 @@ export const Invitation3DScene: React.FC<Invitation3DSceneProps> = ({
       const drawCloud = (cx: number, cy: number, r: number, col: string) => {
         const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
         g.addColorStop(0, col);
-        g.addColorStop(1, 'rgba(255,249,242,0)');
+        g.addColorStop(1, 'rgba(255,255,255,0)');
         ctx.fillStyle = g;
         ctx.beginPath();
         ctx.arc(cx, cy, r, 0, Math.PI * 2);
@@ -916,15 +925,15 @@ export const Invitation3DScene: React.FC<Invitation3DSceneProps> = ({
       return tex;
     };
 
-    // 16. Floating 3D Invitation Card
-    const cardWidth = 0.82;
-    const cardHeight = 1.23;
+    // 16. Floating 3D Invitation Card (refined, elegant proportions)
+    const cardWidth = 0.70;
+    const cardHeight = 1.05;
     const cardDepth = 0.012;
     const cardGeo = new THREE.BoxGeometry(cardWidth, cardHeight, cardDepth);
 
     const baseMat = new THREE.MeshStandardMaterial({
-      color: '#fff8f0',
-      roughness: 0.8,
+      color: '#ffffff',
+      roughness: 0.75,
       metalness: 0,
     });
 
@@ -935,23 +944,23 @@ export const Invitation3DScene: React.FC<Invitation3DSceneProps> = ({
       baseMat.clone(), // Bottom
       new THREE.MeshPhysicalMaterial({
         color: '#ffffff',
-        roughness: 0.7,
+        roughness: 0.55,
         metalness: 0,
-        clearcoat: 0.2,
-        clearcoatRoughness: 0.5,
+        clearcoat: 0.35,
+        clearcoatRoughness: 0.3,
       }), // Front
       baseMat.clone(), // Back
     ];
 
-    cardMats[0].color.set('#f5e8d8');
-    cardMats[1].color.set('#f5e8d8');
-    cardMats[2].color.set('#f5e8d8');
-    cardMats[3].color.set('#f5e8d8');
-    cardMats[5].color.set('#fffaf3');
+    cardMats[0].color.set('#fafafa');
+    cardMats[1].color.set('#fafafa');
+    cardMats[2].color.set('#fafafa');
+    cardMats[3].color.set('#fafafa');
+    cardMats[5].color.set('#ffffff');
 
     const card = new THREE.Mesh(cardGeo, cardMats);
-    card.position.set(0, 0.55, 0);
-    card.rotation.set(-0.06, 0.15, -0.015);
+    card.position.set(0, 0.52, 0);
+    card.rotation.set(-0.03, 0.08, -0.006);
     card.castShadow = true;
     card.receiveShadow = true;
     scene.add(card);
@@ -959,11 +968,11 @@ export const Invitation3DScene: React.FC<Invitation3DSceneProps> = ({
 
     // Contact shadow plane beneath the card
     const shadowPlane = new THREE.Mesh(
-      new THREE.PlaneGeometry(1.2, 0.7),
-      new THREE.MeshBasicMaterial({ color: '#000000', transparent: true, opacity: 0.14 })
+      new THREE.PlaneGeometry(1.05, 0.62),
+      new THREE.MeshBasicMaterial({ color: '#000000', transparent: true, opacity: 0.13 })
     );
     shadowPlane.rotation.x = -Math.PI / 2;
-    shadowPlane.position.set(0.1, 0.001, 0.25);
+    shadowPlane.position.set(0.04, 0.001, 0.16);
     scene.add(shadowPlane);
 
     generateCardTexture().then((tex) => {
@@ -1396,7 +1405,7 @@ export const Invitation3DScene: React.FC<Invitation3DSceneProps> = ({
     controls.maxPolarAngle = Math.PI / 2 - 0.04;
     controls.maxAzimuthAngle = Math.PI / 2.2;
     controls.minAzimuthAngle = -Math.PI / 2.2;
-    controls.target.set(0, 0.55, 0);
+    controls.target.set(0, 0.52, 0);
     controls.autoRotate = autoRotate;
     controls.autoRotateSpeed = 0.35;
     controlsRef.current = controls;
@@ -1474,7 +1483,7 @@ export const Invitation3DScene: React.FC<Invitation3DSceneProps> = ({
       });
 
       // Subtle card breath animation
-      card.position.y = 0.55 + Math.sin(elapsed * 0.6) * 0.004;
+      card.position.y = 0.52 + Math.sin(elapsed * 0.6) * 0.004;
 
       renderer.render(scene, camera);
     };
