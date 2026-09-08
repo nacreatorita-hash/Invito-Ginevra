@@ -13,10 +13,29 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
     <script src="https://www.youtube.com/iframe_api" async></script>
+    <script>
+      // GitHub Pages hosts this project under /Invito-Ginevra/.
+      // Rewrite root-relative image URLs used by the Three.js scene so public assets resolve correctly.
+      (() => {
+        const descriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+        if (!descriptor || !descriptor.set || !descriptor.get) return;
+        Object.defineProperty(HTMLImageElement.prototype, 'src', {
+          configurable: descriptor.configurable,
+          enumerable: descriptor.enumerable,
+          get: descriptor.get,
+          set(value) {
+            let next = value;
+            if (typeof next === 'string' && next.startsWith('/images/')) {
+              next = '/Invito-Ginevra' + next;
+            }
+            descriptor.set.call(this, next);
+          },
+        });
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-
